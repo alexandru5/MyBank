@@ -14,7 +14,11 @@ public class Main {
         System.out.println("Hello Friend!");
         session = Session.getInstance();
         session.initSession();
-        session.computeLoan();
+        if (!session.computeLoan()) {
+            System.out.println("Sowy but we don't have enough money for you, my friend! :*");
+            System.exit(0);
+        }
+
         session.printLoan();
     }
 }
