@@ -144,7 +144,6 @@ public class Session {
         double dae = (customer.getAmountToPay() - customer.getAmount()) * 12
                             / (customer.getAmount() * customer.getPeriod());
         customer.setDae(dae);
-
     }
 
     /**
