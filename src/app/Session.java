@@ -2,6 +2,8 @@ package app;
 
 import database.*;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * class that represents a user session
@@ -10,7 +12,12 @@ public class Session {
     private static Session session;
     private static final String fileName = "src\\database\\db_log.txt";
     private static final String invalidInputError = "!!!!Invalid input!!!! \nPlease try again!";
-    private static final String topDomains[] = {"com", "gov", "edu", "net", "mil", "int", "org"};
+    public static final Pattern VALID_NAME_REGEX =
+            Pattern.compile("[A-Z]+", Pattern.CASE_INSENSITIVE);
+    public static final Pattern VALID_PHONE_NO_REGEX =
+            Pattern.compile("\\+?[0-9]{10,16}", Pattern.CASE_INSENSITIVE);
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     private static final int phoneNoMaxLength = 16;
     private static final int phoneNoMinLength = 10;
     private static Database info;
@@ -39,9 +46,8 @@ public class Session {
      * @return true if valid name else false
      */
     public boolean validName(String name) {
-        for (char c : name.toCharArray())
-            if (!Character.isAlphabetic(c)) return false;
-        return true;
+        Matcher matcher = VALID_NAME_REGEX .matcher(name);
+        return matcher.find();
     }
 
     /**
@@ -50,16 +56,8 @@ public class Session {
      * @return true if valid phone number else false
      */
     public boolean validPhoneNo(String phoneNo) {
-        char[] phNo = phoneNo.toCharArray();
-        if (phNo.length > phoneNoMaxLength || phNo.length < phoneNoMinLength) return false;
-
-        for (char c : phNo)
-            if (!Character.isDigit(c))
-                if (c == '+' && phoneNo.indexOf(c) == 0)
-                    continue;
-                else
-                    return false;
-        return true;
+        Matcher matcher = VALID_PHONE_NO_REGEX.matcher(phoneNo);
+        return matcher.find();
 
     }
 
@@ -69,20 +67,8 @@ public class Session {
      * @return true if valid email else false
      */
     public boolean validEmail(String email) {
-        String parts[] = email.split("@");
-        boolean validDomain = false;
-
-        if (email.indexOf(' ') > -1 || parts.length != 2) return false;
-
-        // check if is everything ok after @
-        String domainPart[] = parts[1].split("\\.");
-        if (domainPart.length != 2) return false;
-
-        for (String s : topDomains)
-            if (domainPart[1].equals(s))
-                validDomain = true;
-
-        return validDomain;
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(email);
+        return matcher.find();
     }
 
     /**
@@ -119,7 +105,6 @@ public class Session {
         while (!readCustomer()) {
             System.out.println(invalidInputError);
         }
-
     }
 
     /**
