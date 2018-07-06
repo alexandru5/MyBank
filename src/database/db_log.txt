@@ -1,0 +1,3 @@
+Robert, Mandresti, +40761232345, robert.mandr@gmail.com, 200.00, 0.03,
+Dragos, Doroftei, +40723212454, dragos.dor@yahoo.com, 300.00, 0.02,
+Stefan, Capatos, +40760394512, stefan.cap@gmail.com, 1000.00, 0.05,
