@@ -18,8 +18,6 @@ public class Session {
             Pattern.compile("\\+?[0-9]{10,16}", Pattern.CASE_INSENSITIVE);
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    private static final int phoneNoMaxLength = 16;
-    private static final int phoneNoMinLength = 10;
     private static Database info;
     private Customer customer;
 
