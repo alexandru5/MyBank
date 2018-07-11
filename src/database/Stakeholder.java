@@ -41,4 +41,6 @@ public class Stakeholder extends Person implements Comparable<Stakeholder> {
     public double getIntRate() {
         return this.intRate;
     }
+
+
 }

@@ -44,7 +44,7 @@ public class Session {
      * @return true if valid name else false
      */
     public boolean validName(String name) {
-        Matcher matcher = VALID_NAME_REGEX .matcher(name);
+        Matcher matcher = VALID_NAME_REGEX.matcher(name);
         return matcher.find();
     }
 
@@ -65,7 +65,7 @@ public class Session {
      * @return true if valid email else false
      */
     public boolean validEmail(String email) {
-        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(email);
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
         return matcher.find();
     }
 
@@ -75,22 +75,28 @@ public class Session {
      */
     public boolean readCustomer() {
         Scanner scanner = new Scanner(System.in);
+
         System.out.print("First name: ");
         String fName = scanner.next();
+        if (!validName(fName)) return false;
+
         System.out.print("Last name: ");
         String lName = scanner.next();
+        if (!validName(lName)) return false;
+
         System.out.print("Phone No: ");
         String phoneNo = scanner.next();
+        if (!validPhoneNo(phoneNo)) return false;
+
         System.out.print("Email: ");
         String email = scanner.next();
+        if (!validEmail(email)) return false;
+
         System.out.print("Amount wanted: ");
         double amount = Double.parseDouble(scanner.next());
         System.out.print("Period: ");
         int period = Integer.parseInt(scanner.next());
-
-        if (!validName(fName) || !validName(lName)  || !validPhoneNo(phoneNo) || !validEmail(email))
-            return false;
-
+        
         customer = new Customer(fName, lName, phoneNo, email, amount, period);
         return true;
     }
@@ -159,10 +165,8 @@ public class Session {
      * print load details
      */
     public void printLoan() {
-        System.out.println("You ( " + customer.getFirstName() + " "
-                                + customer.getLastName() + " ) will actually pay "
-                                + customer.getAmountToPay());
-        System.out.println("Monthly Installment = " + customer.getMonthlyInstallment());
-        System.out.println("DAE = " + customer.getDae() * 100 + "%");
+        System.out.format("You ( %s %s ) will actually pay : %.3f\nMonthly Installment = %.3f\nDAE = %.3f%%  \n",
+                            customer.getFirstName(), customer.getLastName(), customer.getAmountToPay(),
+                            customer.getMonthlyInstallment(), customer.getDae() * 100);
     }
 }
