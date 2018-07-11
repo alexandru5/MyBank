@@ -18,6 +18,10 @@ public class Session {
             Pattern.compile("\\+?[0-9]{10,16}", Pattern.CASE_INSENSITIVE);
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    public static final Pattern VALID_AMOUNT_REGEX =
+            Pattern.compile("[0-9]+[.[0-9]+]?", Pattern.CASE_INSENSITIVE);
+    public static final Pattern VALID_PERIOD_REGEX =
+            Pattern.compile("[1-9]*[0-9]*", Pattern.CASE_INSENSITIVE);
     private static Database info;
     private Customer customer;
 
@@ -70,6 +74,26 @@ public class Session {
     }
 
     /**
+     * check if valid amount
+     * @param amount amount to be checked
+     * @return true if valid amount else false
+     */
+    public boolean validAmount(String amount) {
+        Matcher matcher = VALID_AMOUNT_REGEX.matcher(amount);
+        return matcher.find();
+    }
+
+    /**
+     * check if valid period
+     * @param period period to be checked
+     * @return true if valid period else false
+     */
+    public boolean validPeriod(String period) {
+        Matcher matcher = VALID_PERIOD_REGEX.matcher(period);
+        return matcher.find();
+    }
+
+    /**
      * read customer's data from stdin
      * @return true if valid customer else false
      */
@@ -93,11 +117,16 @@ public class Session {
         if (!validEmail(email)) return false;
 
         System.out.print("Amount wanted: ");
-        double amount = Double.parseDouble(scanner.next());
+        String amount = scanner.next();
+        if (!validAmount(amount)) return false;
+        double amountDouble = Double.parseDouble(amount);
+
         System.out.print("Period: ");
-        int period = Integer.parseInt(scanner.next());
+        String period = scanner.next();
+        if (!validPeriod(period)) return false;
+        int periodInt = Integer.parseInt(period);
         
-        customer = new Customer(fName, lName, phoneNo, email, amount, period);
+        customer = new Customer(fName, lName, phoneNo, email, amountDouble, periodInt);
         return true;
     }
 
