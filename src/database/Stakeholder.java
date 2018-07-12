@@ -42,5 +42,9 @@ public class Stakeholder extends Person implements Comparable<Stakeholder> {
         return this.intRate;
     }
 
-
+    @Override
+    public String toString() {
+        return "('" + getFirstName() + "', '" + getLastName() + "', '" + getPhoneNo() + "', '"
+                + getEmail() + "', " + getAmount() + ", " + getIntRate() + ")";
+    }
 }

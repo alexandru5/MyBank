@@ -2,16 +2,15 @@ package app;
 
 import database.*;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.sql.*;
 
 /**
  * class that represents a user session
  */
 public class Session {
     private static Session session;
-    private static final String fileName = "src\\database\\db_log.txt";
-    private static final String invalidInputError = "!!!!Invalid input!!!! \nPlease try again!";
+    private static final String FILE_NAME = "src\\database\\db_log.txt";
+    private static final String INVALID_INPUT_ERROR = "!!!!Invalid input!!!! \nPlease try again!";
     public static final String VALID_NAME_REGEX = "[a-zA-Z]+";
     public static final String VALID_PHONE_NO_REGEX = "\\+?[0-9]{10,16}";
     public static final String VALID_EMAIL_ADDRESS_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"" +
@@ -23,6 +22,7 @@ public class Session {
                                                             "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
     public static final String VALID_AMOUNT_REGEX = "[0-9]+[.[0-9]+]?";
     public static final String VALID_PERIOD_REGEX = "[1-9]*[0-9]*";
+
     private static Database info;
     private Customer customer;
 
@@ -30,7 +30,7 @@ public class Session {
      * session constructor
      */
     private Session() {
-        info = new Database(3, fileName);
+        info = new Database(3, FILE_NAME);
     }
 
     /**
@@ -131,7 +131,7 @@ public class Session {
     public void initSession() {
         info.loadDatabase();
         while (!readCustomer()) {
-            System.out.println(invalidInputError);
+            System.out.println(INVALID_INPUT_ERROR);
         }
     }
 

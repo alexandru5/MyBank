@@ -52,4 +52,12 @@ public class Person {
     public double getAmount() {
         return this.amount;
     }
+
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 }
