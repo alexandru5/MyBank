@@ -21,6 +21,8 @@ public class Database {
     private final String DB_URL = "jdbc:mysql://localhost:3306/sakila?verifyServerCertificate=false&useSSL=true";
     private final String INSERT_STATEMENT_SQL = "INSERT INTO stakeholders(FIRST_NAME, LAST_NAME, PHONE_NO, EMAIL, AMOUNT, INTEREST) VALUES "
                                                     + "(?, ?, ?, ?, ?, ?)";
+    private final String SELECT_STATEMENT_SQL = "SELECT FIRST_NAME, LAST_NAME, PHONE_NO, EMAIL, AMOUNT, INTEREST"
+                                                + " FROM stakeholders ORDER BY INTEREST";
 
     static final String USER = "root";
     static final String PASS = "weed";
@@ -123,18 +125,53 @@ public class Database {
     }
 
     /**
-     * read stakeholders from file and load the into database
+     * read stakeholders from file and load them into database
      */
     public void readStakeholders() {
         try (Stream<String> readStream = Files.lines(Paths.get(fileName))){
 
             readStream.map(element -> element.split(","))
-                      .forEach(parts -> this.database.add(createStakeholder(parts)));
+                      .forEach(parts -> {
+                          try {
+                              insertIntoDatabase(createStakeholder(parts));
+                          } catch (SQLException e) {
+                              e.printStackTrace();
+                          }
+                      });
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void readStakeholdersFromDB() throws SQLException {
+        try{
+            connection = getDBConnection();
+            statement = connection.prepareStatement(SELECT_STATEMENT_SQL);
+
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+                String fName = result.getString("FIRST_NAME");
+                String lName = result.getString("LAST_NAME");
+                String phoneNo = result.getString("PHONE_NO");
+                String email = result.getString("EMAIL");
+                Double amount = result.getDouble("AMOUNT");
+                Double interest = result.getDouble("INTEREST");
+                this.database.add(new Stakeholder(fName, lName, phoneNo, email, amount, interest));
+            }
+
+        }catch(SQLException se){
+            se.printStackTrace();
+        }finally{
+            if (statement != null) {
+                statement.close();
+            }
+
+            if (connection != null) {
+                connection.close();
+            }
+        }
+    }
     /**
      * sorts the stakeholders' array by interest rate
      */
@@ -146,10 +183,9 @@ public class Database {
      * read and sort database
      */
     public void loadDatabase () throws SQLException {
-        this.readStakeholders();
-
-        for (Stakeholder s : database)
-            this.insertIntoDatabase(s);
-        this.sortStakeholders();
+        this.readStakeholdersFromDB();
+        //for (Stakeholder s : database)
+        //    System.out.println(s.toString());
+        //this.sortStakeholders();
     }
 }

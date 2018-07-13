@@ -128,7 +128,7 @@ public class Session {
     /**
      * init session with database and customer
      */
-    public void initSession() {
+    public void initSession() throws SQLException {
         info.loadDatabase();
         while (!readCustomer()) {
             System.out.println(INVALID_INPUT_ERROR);

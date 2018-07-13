@@ -1,5 +1,7 @@
 package app;
 
+import java.sql.SQLException;
+
 /**
  * Main class that starts a session
  */
@@ -10,7 +12,7 @@ public class Main {
      * main function
      * @param args TODO
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         System.out.println("Hello Friend!");
         session = Session.getInstance();
         session.initSession();
