@@ -7,6 +7,7 @@ public class Person {
     /**
      * first name of a person
      */
+    //private int id;
     private String firstName;
     private String lastName;
     private String phoneNo;
@@ -59,5 +60,12 @@ public class Person {
 
     public String getEmail() {
         return email;
+    }
+
+    public double getIntRate() {
+        return 0;
+    }
+    public int getPeriod() {
+        return 0;
     }
 }

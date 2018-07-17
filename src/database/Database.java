@@ -1,11 +1,13 @@
 package database;
 
+import javax.xml.validation.Schema;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -16,11 +18,14 @@ import java.util.stream.Stream;
 public class Database {
     private final int noOfStakeholders;
     private final String fileName;
-    private ArrayList<Stakeholder> database;
+    private List<Stakeholder> database;
     private final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    private final int NO_OF_LABELS = 6;
     private final String DB_URL = "jdbc:mysql://localhost:3306/sakila?verifyServerCertificate=false&useSSL=true";
-    private final String INSERT_STATEMENT_SQL = "INSERT INTO stakeholders(FIRST_NAME, LAST_NAME, PHONE_NO, EMAIL, AMOUNT, INTEREST) VALUES "
-                                                    + "(?, ?, ?, ?, ?, ?)";
+    private final String INSERT_STAKEHOLDER_STATEMENT_SQL = "INSERT INTO stakeholders(FIRST_NAME, LAST_NAME, PHONE_NO, " +
+            "                                                   EMAIL, AMOUNT, INTEREST) VALUES(?, ?, ?, ?, ?, ?)";
+    private final String INSERT_CLIENT_STATEMENT_SQL = "INSERT INTO clients(FIRST_NAME, LAST_NAME, PHONE_NO, " +
+            "                                                   EMAIL, AMOUNT, PERIOD) VALUES(?, ?, ?, ?, ?, ?)";
     private final String SELECT_STATEMENT_SQL = "SELECT FIRST_NAME, LAST_NAME, PHONE_NO, EMAIL, AMOUNT, INTEREST"
                                                 + " FROM stakeholders ORDER BY INTEREST";
 
@@ -53,7 +58,7 @@ public class Database {
      * geter for the database that contains stakeholders' details
      * @return an array of stakeholders
      */
-    public ArrayList<Stakeholder> getDatabase() {
+    public List<Stakeholder> getDatabase() {
         return this.database;
     }
 
@@ -92,35 +97,33 @@ public class Database {
     }
 
     /**
-     * insert into Database new stakeholder
-     * @param newStakeholder to be inserted
+     * insert into Database new client
+     * @param newClient to be inserted
      * @throws SQLException
      */
-    public void insertIntoDatabase(Stakeholder newStakeholder) throws SQLException {
+    public void insertIntoDatabase(Person newClient) throws SQLException {
+        String insertStatement = newClient instanceof Stakeholder ? INSERT_STAKEHOLDER_STATEMENT_SQL : INSERT_CLIENT_STATEMENT_SQL;
 
         try{
             connection = getDBConnection();
-            statement = connection.prepareStatement(INSERT_STATEMENT_SQL);
+            statement = connection.prepareStatement(insertStatement);
+            statement.setString(1, newClient.getFirstName());
+            statement.setString(2, newClient.getLastName());
+            statement.setString(3, newClient.getPhoneNo());
+            statement.setString(4, newClient.getEmail());
+            statement.setDouble(5, newClient.getAmount());
 
-            statement.setString(1, newStakeholder.getFirstName());
-            statement.setString(2, newStakeholder.getLastName());
-            statement.setString(3, newStakeholder.getPhoneNo());
-            statement.setString(4, newStakeholder.getEmail());
-            statement.setDouble(5, newStakeholder.getAmount());
-            statement.setDouble(6, newStakeholder.getIntRate());
+            if (newClient instanceof Stakeholder)
+                statement.setDouble(6, newClient.getIntRate());
+            else
+                statement.setInt(6, newClient.getPeriod());
 
             statement.executeUpdate();
-
         }catch(SQLException se){
             se.printStackTrace();
         }finally{
-            if (statement != null) {
-                statement.close();
-            }
-
-            if (connection != null) {
-                connection.close();
-            }
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
         }
     }
 
@@ -143,6 +146,15 @@ public class Database {
         }
     }
 
+    public String[] getPartsFromSet(ResultSet rs) throws SQLException {
+        String[] parts = new String[NO_OF_LABELS];
+
+        for (int i = 1; i <= NO_OF_LABELS; i++)
+            parts[i - 1] = rs.getString(i);
+
+        return parts;
+    }
+
     public void readStakeholdersFromDB() throws SQLException {
         try{
             connection = getDBConnection();
@@ -150,15 +162,8 @@ public class Database {
 
             ResultSet result = statement.executeQuery();
 
-            while (result.next()) {
-                String fName = result.getString("FIRST_NAME");
-                String lName = result.getString("LAST_NAME");
-                String phoneNo = result.getString("PHONE_NO");
-                String email = result.getString("EMAIL");
-                Double amount = result.getDouble("AMOUNT");
-                Double interest = result.getDouble("INTEREST");
-                this.database.add(new Stakeholder(fName, lName, phoneNo, email, amount, interest));
-            }
+            while (result.next())
+                this.database.add(createStakeholder(getPartsFromSet(result)));
 
         }catch(SQLException se){
             se.printStackTrace();

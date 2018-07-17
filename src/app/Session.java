@@ -130,9 +130,10 @@ public class Session {
      */
     public void initSession() throws SQLException {
         info.loadDatabase();
-        while (!readCustomer()) {
+        while (!readCustomer())
             System.out.println(INVALID_INPUT_ERROR);
-        }
+
+        info.insertIntoDatabase(customer);
     }
 
     /**
